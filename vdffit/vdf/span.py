@@ -72,13 +72,14 @@ class SPANDistribution(VDFBase):
 
         The last index is the velocity component.
         """
-        modv = self.modv
+        modv = self._modv
         vx = modv * np.cos(self._theta) * np.cos(self._phi)
         vy = modv * np.cos(self._theta) * np.sin(self._phi)
         vz = modv * np.sin(self._theta)
         v = np.stack([vx, vy, vz], axis=-1)
         return v
 
+    @cached_property
     def velocities(self):
         """
         Velocity in the spacecraft frame.
@@ -110,3 +111,8 @@ class SPANDistribution(VDFBase):
         """
         return (self.eflux * 2 /
                 self._modv**4).to(u.s**3 / u.m**6)
+
+    @property
+    def mask(self):
+        # Only select values within 1% of peak VDF value
+        return (self.vdf > 0.01 * np.nanmax(self.vdf)).astype(bool)

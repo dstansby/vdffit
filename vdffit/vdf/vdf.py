@@ -43,3 +43,11 @@ class VDFBase(abc.ABC):
 
         Must be in units equivalent to seconds**3 / meters**6.
         """
+
+    @property
+    def mask(self):
+        """
+        An optional mask to indicate bad data values. By default all values
+        are marked as good.
+        """
+        return np.ones(self.vdf.shape)
