@@ -1,7 +1,7 @@
 import abc
 
 
-class VDF(abc.ABC):
+class VDFBase(abc.ABC):
     """
     A single velocity distribution function.
     """

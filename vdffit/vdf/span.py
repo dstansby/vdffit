@@ -3,10 +3,10 @@ from functools import cached_property
 import astropy.units as u
 import numpy as np
 
-from .vdf import VDF
+from .vdf import VDFBase
 
 
-class SPANDistribution(VDF):
+class SPANDistribution(VDFBase):
     """
     A single distribution measured by SPAN.
 
