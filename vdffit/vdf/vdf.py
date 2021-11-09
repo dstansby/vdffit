@@ -22,7 +22,7 @@ class VDFBase(abc.ABC):
         of each quality flag.
         """
 
-    @abc.abstractmethod
+    @abc.abstractproperty
     def bvec(self):
         """
         Magnetic field vector associated with this distribution function.

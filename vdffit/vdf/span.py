@@ -63,6 +63,7 @@ class SPANDistribution(VDFBase):
         elif not self.has_angular_resolution():
             return 6
 
+    @property
     def bvec(self):
         return self._bvec
 
