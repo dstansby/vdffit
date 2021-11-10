@@ -20,9 +20,6 @@ class BiMaxFitter(FitterBase):
         -------
         fit_params : fitting.BiMaxwellParams
         """
-        # Rotate velocities into field aligned frame
-        v_b_frame = self._v_b_frame
-
         if len(vdf) < 12:
             return 2, {}
 

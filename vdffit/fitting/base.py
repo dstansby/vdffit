@@ -26,7 +26,9 @@ class FitterBase(abc.ABC):
         print(dist.mask)
         velocities = velocities[dist.mask, :]
         vdf = vdf[dist.mask]
-        # TODO: put velocities into field aligned frame
+        # Rotate velocities into field aligned frame
+        R = dist.bvec.rotation_matrix
+        velocities = np.einsum('ij,kj->ki', R, velocities)
         # Pass to fitting method
         status, params = self.run_single_fit(velocities, vdf)
 
