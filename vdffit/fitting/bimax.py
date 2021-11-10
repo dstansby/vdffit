@@ -4,6 +4,9 @@ from .base import FitterBase
 
 
 class BiMaxFitter(FitterBase):
+    @property
+    def fit_param_names(self):
+        return ['A', 'vx', 'vy', 'vz', 'vth_perp', 'vth_par']
 
     def status_info(self):
         return {2: "Less than 12 points available for fit.",

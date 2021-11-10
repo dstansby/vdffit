@@ -30,6 +30,12 @@ class FitterBase(abc.ABC):
         # Pass to fitting method
         status, params = self.run_single_fit(velocities, vdf)
 
+    @abc.abstractproperty
+    def fit_param_names(self):
+        """
+        Return a list of parameter names fitted by the fitter.
+        """
+
     @abc.abstractmethod
     def run_single_fit(self, velocities, vdf):
         """
