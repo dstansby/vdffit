@@ -5,14 +5,14 @@ import astropy.constants as const
 import numpy as np
 
 from vdffit.vdf import SPANDistribution
-from vdffit.io.cdf import CDFFile
+from vdffit.io.cdf import VDFCDF
 from vdffit.io.psp.mag import MAGL2
 
 
 base_dir = pathlib.Path('/Volumes/Work/Data/psp/sweap/span')
 
 
-class SPANL2CDF(CDFFile):
+class SPANL2CDF(VDFCDF):
     """
     A SWEAP SPAN level 2 file.
 

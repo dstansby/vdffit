@@ -11,7 +11,7 @@ class BiMaxFitter(FitterBase):
 
     def status_info(self):
         return {2: "Less than 12 points available for fit.",
-                3: "Velocity at peak VDF is non-finite."
+                3: "Velocity at peak VDF is non-finite.",
                 4: "Fitted velocity is out of the VDF bounds."}
 
     @staticmethod

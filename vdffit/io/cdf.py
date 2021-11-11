@@ -78,3 +78,17 @@ class CDFFile(abc.ABC):
         epochs = self.cdf.varget(self.epoch_var)
         times = cdflib.cdfepoch.to_datetime(epochs)
         return times
+
+    def __len__(self):
+        return len(self.times)
+
+
+class VDFCDF(CDFFile):
+    """
+    A CDF file containing velocity distribution functions.
+    """
+    @abc.abstractmethod
+    def __getitem__(self, i):
+        """
+        Get the ith distribution funciton. Must return a VDFBase instance.
+        """
