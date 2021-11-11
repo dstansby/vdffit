@@ -1,22 +1,46 @@
 import abc
 
+from astropy.table import QTable
 import astropy.units as u
 import numpy as np
+import pandas as pd
 
 
 class FitterBase(abc.ABC):
     vunit = u.km / u.s
     vdfunit = u.s**3 / u.m**6
 
-    def fit(self, dist):
+    def fit_cdf(self, cdf):
         """
+        Fit all velocity distribution functions in a CDF file.
+
+        Parameters
+        ----------
+        cdf : vdffit.io.CDFFile
+        """
+        params = {}
+        times = cdf.times
+        for t in times[:4]:
+            params[t] = self.fit_single(cdf[t])
+
+        params = self.post_fit_process(params)
+        return params
+
+    def fit_single(self, dist):
+        """
+        Fit a single velocity distribution function.
+
         Derived classes should **not** override this, but instead should
         implement ``run_single_fit()``.
 
+
+        Parameters
+        ----------
+        dist : vdffit.vdf.VDFBase
+            A single velocity distribution function.
+
         Returns
         -------
-        status : int
-            Fitting status. 1 for a succesful fit.
         params : dict
             Fit parameters.
         """
@@ -24,11 +48,14 @@ class FitterBase(abc.ABC):
         velocities = dist.velocities.to_value(self.vunit)
         vdf = dist.vdf.to_value(self.vdfunit)
         # Apply mask
-        print(dist.mask)
         velocities = velocities[dist.mask, :]
         vdf = vdf[dist.mask]
         # Pass to fitting method
         status, params = self.run_single_fit(velocities, vdf, dist.bvec)
+        if status != 1:
+            params = [np.nan] * len(fit_param_names)
+        params = {k: v for k, v in zip(self.fit_param_names, params)}
+        params['fit status'] = status
         return params
 
     @abc.abstractproperty
@@ -62,4 +89,16 @@ class FitterBase(abc.ABC):
         """
         Return a `dict` containing information about the status codes that the
         fitting method can return.
+        """
+
+    @abc.abstractmethod
+    def post_fit_process(self, params):
+        """
+        Parameters
+        ----------
+        params : dict[datetime: list]
+
+        Returns
+        -------
+        astropy.table.QTable
         """

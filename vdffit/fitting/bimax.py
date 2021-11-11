@@ -1,5 +1,9 @@
+from astropy.timeseries import TimeSeries
 import numpy as np
 import scipy.optimize as opt
+import astropy.constants as const
+import astropy.units as u
+import pandas as pd
 
 from .base import FitterBase
 
@@ -75,7 +79,7 @@ class BiMaxFitter(FitterBase):
 
         # Transform bulk velocity out of field aligned frame
         fitparams[1:4] = np.einsum('ij,j->i', R.T, v_bulk)
-        return 1, {k: v for k, v in zip(self.fit_param_names, fitparams)}
+        return 1, fitparams
 
     def initial_guesses(self, vs, vdf):
         """
@@ -90,3 +94,29 @@ class BiMaxFitter(FitterBase):
         A0 = vdf[peak_idx]
         v0 = vs[peak_idx, :]
         return [A0, v0[0], v0[1], v0[2], 40, 40]
+
+    def post_fit_process(self, params):
+        params = pd.DataFrame(params).T
+        ts = TimeSeries(time=params.index)
+        ts['n'] = (params['A'].values * self.vdfunit *
+                   np.pi**(3 / 2) *
+                   (params['vth_perp'].values * self.vunit)**2 *
+                   params['vth_par'].values * self.vunit).to(u.cm**-3)
+        ts['vx'] = params['vx'].values * self.vunit
+        ts['vy'] = params['vy'].values * self.vunit
+        ts['vz'] = params['vz'].values * self.vunit
+        ts['T_perp'] = self.v_to_T(params['vth_perp'].values * self.vunit)
+        ts['T_par'] = self.v_to_T(params['vth_par'].values * self.vunit)
+        return ts
+
+    @staticmethod
+    def v_to_T(v):
+        """
+        Convert thermal speed to temperature.
+
+        Notes
+        -----
+        Proton mass is hardcoded.
+        """
+        m = const.m_p
+        return (m * v**2 / (2 * const.k_B.si)).to(u.K)
