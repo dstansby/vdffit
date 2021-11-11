@@ -17,7 +17,6 @@ class SPANDistribution(VDFBase):
     def __init__(self, eflux, energy, theta, phi, mass, time, bvec, species):
         keep = np.isfinite(theta)
         self.eflux = eflux[keep]
-        self._energy = energy[keep]
         self._theta = theta[keep]
         self._phi = phi[keep]
         self._time = time
@@ -25,14 +24,25 @@ class SPANDistribution(VDFBase):
         self._bvec = bvec
         self.species = species
 
+        self._modv = np.sqrt(2 * energy[keep] / self.mass).to(u.km / u.s)
+
     @property
     def time(self):
         return self._time
 
+    @cached_property
+    def peak_vdf(self):
+        """
+        Return index and value of peak VDF.
+        """
+        idx = np.nanargmax(self.vdf)
+        return idx, self.vdf[idx]
+
     # Quality checks
-    @property
+    @cached_property
     def peak_idx(self):
-        return np.unravel_index(np.nanargmax(self.vdf), self.shape)
+        idx, _ = self.peak_vdf
+        return np.unravel_index(idx, self.shape)
 
     def max_vdf_on_edge(self):
         """
@@ -108,13 +118,6 @@ class SPANDistribution(VDFBase):
         vz = vinstr[:, 0]
         return np.stack([vx, vy, vz], axis=-1)
 
-    @property
-    def _modv(self):
-        """
-        3D array of |v| in the instrument frame.
-        """
-        return np.sqrt(2 * self._energy / self.mass).to(u.km / u.s)
-
     @cached_property
     def vdf(self):
         """
@@ -125,5 +128,6 @@ class SPANDistribution(VDFBase):
 
     @property
     def mask(self):
+        _, peak_val = self.peak_vdf
         # Only select values within 1% of peak VDF value
-        return (self.vdf > 0.01 * np.nanmax(self.vdf)).astype(bool)
+        return (self.vdf > 0.01 * peak_val).astype(bool)
