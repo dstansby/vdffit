@@ -53,9 +53,10 @@ class FitterBase(abc.ABC):
         # Pass to fitting method
         status, params = self.run_single_fit(velocities, vdf, dist.bvec)
         if status != 1:
-            params = [np.nan] * len(fit_param_names)
+            params = [np.nan] * len(self.fit_param_names)
         params = {k: v for k, v in zip(self.fit_param_names, params)}
         params['fit status'] = status
+        params['quality flag'] = dist.quality_flag()
         return params
 
     @abc.abstractproperty

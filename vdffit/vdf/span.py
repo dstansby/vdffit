@@ -26,6 +26,10 @@ class SPANDistribution(VDFBase):
         self.species = species
 
     # Quality checks
+    @property
+    def peak_idx(self):
+        return np.unravel_index(np.nanargmax(self.vdf), self.shape)
+
     def max_vdf_on_edge(self):
         """
         Return True if the peak of the VDF is at the edge of the angular bins.
@@ -52,16 +56,18 @@ class SPANDistribution(VDFBase):
 
     def quality_flag_info(self):
         return {2: "Peak of the distribution function is on an edge.",
-                6: "Not all bins adjacent to peak VDF have finite data.",
-                7: "Distribution function doesn't have 8x32x8 points."}
+                3: "Not all bins adjacent to peak VDF have finite data.",
+                4: "Distribution function doesn't have 8x32x8 points."}
 
     def quality_flag(self):
         if self.eflux.size != 8 * 32 * 8:
-            return 7
+            return 4
         elif self.max_vdf_on_edge():
             return 2
         elif not self.has_angular_resolution():
-            return 6
+            return 3
+        else:
+            return 1
 
     @property
     def bvec(self):

@@ -16,7 +16,8 @@ class BiMaxFitter(FitterBase):
     def status_info(self):
         return {2: "Less than 12 points available for fit.",
                 3: "Velocity at peak VDF is non-finite.",
-                4: "Fitted velocity is out of the VDF bounds."}
+                4: "Fit failed.",
+                5: "Fitted velocity is out of the VDF bounds."}
 
     @staticmethod
     def bi_maxwellian_3D(vx, vy, vz, A, vbx, vby, vbz, vth_z, vth_perp):
@@ -68,6 +69,8 @@ class BiMaxFitter(FitterBase):
                                    ftol=1e-6, xtol=1e-14)
 
         fitparams = fitout.x
+        if fitout.status <= 0 or fitparams[4] == fitparams[5]:
+            return 4, {}
 
         v_bulk = fitparams[1:4]
         out_of_bounds = [(v_bulk[i] < np.min(vs[:, i]) or
@@ -75,7 +78,7 @@ class BiMaxFitter(FitterBase):
                          for i in range(3)]
         out_of_bounds = np.any(out_of_bounds)
         if out_of_bounds:
-            return 4, {}
+            return 5, {}
 
         # Transform bulk velocity out of field aligned frame
         fitparams[1:4] = np.einsum('ij,j->i', R.T, v_bulk)
@@ -107,6 +110,8 @@ class BiMaxFitter(FitterBase):
         ts['vz'] = params['vz'].values * self.vunit
         ts['T_perp'] = self.v_to_T(params['vth_perp'].values * self.vunit)
         ts['T_par'] = self.v_to_T(params['vth_par'].values * self.vunit)
+        ts['Fit status'] = params['fit status'].values.astype(int)
+        ts['Quality flag'] = params['quality flag'].values.astype(int)
         return ts
 
     @staticmethod
