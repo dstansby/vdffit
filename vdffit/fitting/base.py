@@ -1,6 +1,7 @@
 import abc
 
 import astropy.units as u
+import numpy as np
 
 
 class FitterBase(abc.ABC):
@@ -26,11 +27,9 @@ class FitterBase(abc.ABC):
         print(dist.mask)
         velocities = velocities[dist.mask, :]
         vdf = vdf[dist.mask]
-        # Rotate velocities into field aligned frame
-        R = dist.bvec.rotation_matrix
-        velocities = np.einsum('ij,kj->ki', R, velocities)
         # Pass to fitting method
-        status, params = self.run_single_fit(velocities, vdf)
+        status, params = self.run_single_fit(velocities, vdf, dist.bvec)
+        return params
 
     @abc.abstractproperty
     def fit_param_names(self):
@@ -39,7 +38,7 @@ class FitterBase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def run_single_fit(self, velocities, vdf):
+    def run_single_fit(self, velocities, vdf, bvec):
         """
         Fit a single distribution funciton.
 

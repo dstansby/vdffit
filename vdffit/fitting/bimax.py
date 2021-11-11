@@ -1,3 +1,4 @@
+import numpy as np
 import scipy.optimize as opt
 
 from .base import FitterBase
@@ -12,9 +13,28 @@ class BiMaxFitter(FitterBase):
         return {2: "Less than 12 points available for fit.",
                 4: "Fitted velocity is out of the VDF bounds."}
 
-    def run_single_fit(self, vs, vdf):
+    @staticmethod
+    def bi_maxwellian_3D(vx, vy, vz, A, vbx, vby, vbz, vth_z, vth_perp):
+        '''
+        Return distribution function at (vx, vy, vz),
+        given 6 distribution parameters.
+        '''
+        # Put in bulk frame
+        vx = vx - vbx
+        vy = vy - vby
+        vz = vz - vbz
+        exponent = (vx / vth_perp)**2 + (vy / vth_perp)**2 + (vz / vth_z)**2
+        return A * np.exp(-exponent)
+
+    def run_single_fit(self, vs, vdf, bvec):
         """
         Fit a bi-Maxwellian distribution function.
+
+        Parameters
+        ----------
+        vs : numpy.ndarray
+        vdf : numpy.ndarray
+        bvec : Vector
 
         Returns
         -------
@@ -23,35 +43,47 @@ class BiMaxFitter(FitterBase):
         if len(vdf) < 12:
             return 2, {}
 
+        # Rotate velocities into field aligned frame
+        R = bvec.rotation_matrix
+        vs = np.einsum('ij,kj->ki', R, vs)
+
         # Residuals to minimize
-        def resid(maxwell_params, v_b_frame, vdf):
-            fit = fitting.bi_maxwellian_3D(v_b_frame[:, 0], v_b_frame[:, 1],
-                                           v_b_frame[:, 2], *maxwell_params)
+        def resid(maxwell_params, vs, vdf):
+            fit = self.bi_maxwellian_3D(vs[:, 0], vs[:, 1],
+                                        vs[:, 2], *maxwell_params)
             return vdf - fit
 
-        guesses = self._initial_guesses
-        if np.any(np.isnan(guesses.fit_guess_tuple[1:4])):
+        guesses = self.initial_guesses(vs, vdf)
+        if np.any(np.isnan([guesses[1], guesses[2], guesses[3]])):
             return 5, {}
-        fitout = opt.least_squares(resid, guesses.fit_guess_tuple,
-                                   args=(v_b_frame, vdf), method='lm',
+
+        # Do fitting
+        fitout = opt.least_squares(resid, guesses,
+                                   args=(vs, vdf), method='lm',
                                    ftol=1e-6, xtol=1e-14)
 
         fitparams = fitout.x
 
         v = fitparams[1:4]
-        out_of_bounds = [(v[i] < np.min(v_b_frame[:, i]) or
-                          v[i] > np.max(v_b_frame[:, i]))
+        out_of_bounds = [(v[i] < np.min(vs[:, i]) or
+                          v[i] > np.max(vs[:, i]))
                          for i in range(3)]
         out_of_bounds = np.any(out_of_bounds)
         if out_of_bounds:
             return 4, {}
 
-        # Put v back into the spacecraft frame
-        v = np.dot(self.bvec.rotation_matrix.T, v)
-        fit_params = fitting.BiMaxwellParams(fitparams[0] * vdfunit,
-                                             v * vunit,
-                                             fitparams[4] * vunit,
-                                             fitparams[5] * vunit,
-                                             self.bvec.vec * Bunit)
+        return 1, {k: v for k, v in zip(self.fit_param_names, fitparams)}
 
-        return fit_params, 1
+    def initial_guesses(self, vs, vdf):
+        """
+        Initial gueses for a bimaxwellian fit.
+
+        Parameters
+        ----------
+        vs : numpy.ndarray
+        vdf : numpy.ndarray
+        """
+        peak_idx = np.nanargmax(vdf)
+        A0 = vdf[peak_idx]
+        v0 = vs[peak_idx, :]
+        return [A0, v0[0], v0[1],  v0[2], 40, 40]
