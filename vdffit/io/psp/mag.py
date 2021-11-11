@@ -1,5 +1,6 @@
 from datetime import date
 import pathlib
+from functools import cached_property
 
 import cdflib
 import numpy as np
@@ -31,18 +32,13 @@ class MAGL2(CDFFile):
 
         return base_dir / self.date.strftime('%Y') / fname
 
-    def get_bvec(self, dtime):
+    @cached_property
+    def all_bvecs(self):
+        return self.cdf.varget('psp_fld_l2_mag_SC_4_Sa_per_Cyc')
+
+    def get_bvec(self, epoch):
         """
         Get the magnetic field vector closest to *time*.
         """
-        epochs = self.cdf.varget(self.epoch_var)
-        dtime = cdflib.cdfepoch.compute([dtime.year, dtime.month, dtime.day,
-                                         dtime.hour, dtime.minute,
-                                         dtime.second,
-                                         dtime.microsecond // 1000,
-                                         dtime.microsecond % 1000,
-                                         0])
-        idx = np.argmin(np.abs(epochs - dtime))
-        mag = self.cdf.varget('psp_fld_l2_mag_SC_4_Sa_per_Cyc',
-                              startrec=idx, endrec=idx)
-        return Vector(mag[0])
+        idx = np.argmin(np.abs(epoch - self.epochs))
+        return Vector(self.all_bvecs[idx, :])

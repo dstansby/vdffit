@@ -67,6 +67,10 @@ class CDFFile(abc.ABC):
         return var * u.Unit(units)
 
     @cached_property
+    def epochs(self):
+        return self.cdf.varget(self.epoch_var)
+
+    @cached_property
     def times(self):
         """
         Times.
@@ -75,9 +79,7 @@ class CDFFile(abc.ABC):
         -------
         list[datetime.datetime]
         """
-        epochs = self.cdf.varget(self.epoch_var)
-        times = cdflib.cdfepoch.to_datetime(epochs)
-        return times
+        return cdflib.cdfepoch.to_datetime(self.epochs)
 
     def __len__(self):
         return len(self.times)

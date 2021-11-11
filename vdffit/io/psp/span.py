@@ -69,6 +69,8 @@ class SPANL2CDF(VDFCDF):
         else:
             time = self.times[idx]
 
+        epoch = self.epochs[idx]
+
         if self.species == 'p':
             mass = const.m_p
         elif self.species == 'a':
@@ -79,7 +81,7 @@ class SPANL2CDF(VDFCDF):
                                 self.phi[idx, :],
                                 mass,
                                 time,
-                                self.mag_cdf.get_bvec(time),
+                                self.mag_cdf.get_bvec(epoch),
                                 self.species)
 
     @property
