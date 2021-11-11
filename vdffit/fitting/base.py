@@ -5,6 +5,8 @@ import astropy.units as u
 import numpy as np
 import pandas as pd
 
+from joblib import Parallel, delayed
+
 
 class FitterBase(abc.ABC):
     vunit = u.km / u.s
@@ -18,11 +20,9 @@ class FitterBase(abc.ABC):
         ----------
         cdf : vdffit.io.CDFFile
         """
-        params = {}
         times = cdf.times
-        for t in times[:4]:
-            params[t] = self.fit_single(cdf[t])
-
+        params = Parallel(n_jobs=-1, verbose=1)(
+            delayed(self.fit_single)(cdf[t]) for t in times)
         params = self.post_fit_process(params)
         return params
 
@@ -57,6 +57,7 @@ class FitterBase(abc.ABC):
         params = {k: v for k, v in zip(self.fit_param_names, params)}
         params['fit status'] = status
         params['quality flag'] = dist.quality_flag()
+        params['Time'] = dist.time
         return params
 
     @abc.abstractproperty

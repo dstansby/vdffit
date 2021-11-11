@@ -20,10 +20,14 @@ class SPANDistribution(VDFBase):
         self._energy = energy[keep]
         self._theta = theta[keep]
         self._phi = phi[keep]
-        self.time = time
+        self._time = time
         self.mass = mass
         self._bvec = bvec
         self.species = species
+
+    @property
+    def time(self):
+        return self._time
 
     # Quality checks
     @property

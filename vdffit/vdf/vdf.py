@@ -23,6 +23,10 @@ class VDFBase(abc.ABC):
         """
 
     @abc.abstractproperty
+    def time(self):
+        return self._time
+
+    @abc.abstractproperty
     def bvec(self):
         """
         Magnetic field vector associated with this distribution function.

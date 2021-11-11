@@ -99,8 +99,8 @@ class BiMaxFitter(FitterBase):
         return [A0, v0[0], v0[1], v0[2], 40, 40]
 
     def post_fit_process(self, params):
-        params = pd.DataFrame(params).T
-        ts = TimeSeries(time=params.index)
+        params = pd.DataFrame(params)
+        ts = TimeSeries(time=params['Time'])
         ts['n'] = (params['A'].values * self.vdfunit *
                    np.pi**(3 / 2) *
                    (params['vth_perp'].values * self.vunit)**2 *
