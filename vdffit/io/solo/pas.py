@@ -4,7 +4,7 @@ import pathlib
 import astropy.constants as const
 import numpy as np
 
-from vdffit.vdf import SPANDistribution
+from vdffit.vdf import PASDistribution
 from vdffit.io.cdf import VDFCDF
 from vdffit.io.solo.mag import MAGL2
 
@@ -24,8 +24,6 @@ class PASL2CDF(VDFCDF):
         ----------
         date : astropy.time.Time
             Date of file.
-        species : str, optional
-            Species. Can be 'p' for protons or 'a' for alphas.
         """
         self.date = date
         self.mag_cdf = MAGL2(date)
@@ -34,6 +32,13 @@ class PASL2CDF(VDFCDF):
 
     @property
     def path(self):
+        """
+        Path to CDF file.
+
+        Returns
+        -------
+        pathlib.Path
+        """
         date_str = self.date.strftime('%Y%m%d')
         fname = f'solo_L2_swa-pas-vdf_{date_str}_V02.cdf'
         return base_dir / fname
@@ -48,7 +53,7 @@ class PASL2CDF(VDFCDF):
 
         Returns
         -------
-        SPAN_distribution
+        PASDistribution
         """
         if not isinstance(idx, int):
             time = idx
@@ -60,38 +65,45 @@ class PASL2CDF(VDFCDF):
 
         epoch = self.epochs[idx]
 
-        return SPANDistribution(self.eflux[idx, :],
-                                self.energy[idx, :],
-                                self.theta[idx, :],
-                                self.phi[idx, :],
-                                time,
-                                self.mag_cdf.get_bvec(epoch),
-                                self.species)
+        return PASDistribution(self.vdf[idx, ...],
+                               self.energy,
+                               self.theta,
+                               self.phi,
+                               time,
+                               self.mag_cdf.get_bvec(epoch))
 
     @cached_property
-    def eflux(self):
+    def vdf(self):
         """
-        Differential energy flux.
+        Velocity distribution function.
+
+        Shape (ntime, ntheta, nphi, nenergy).
         """
-        return self.varget('EFLUX')
+        return self.varget('vdf')
 
     @cached_property
     def energy(self):
         """
         Energies.
+
+        Shape (nenergy).
         """
-        return self.varget('ENERGY')
+        return self.varget('Energy')
 
     @cached_property
     def theta(self):
         """
         Theta values.
+
+        Shape (ntheta, nphi, nenergy).
         """
-        return self.varget('THETA')
+        return self.varget('Full_elevation')
 
     @cached_property
     def phi(self):
         """
         Phi values.
+
+        Shape (ntheta, nphi, nenergy).
         """
-        return self.varget('PHI')
+        return self.varget('Full_azimuth')

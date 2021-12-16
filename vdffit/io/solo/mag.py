@@ -4,6 +4,7 @@ import pathlib
 import numpy as np
 
 from vdffit.io.cdf import CDFFile
+from vdffit.util.vector import Vector
 
 base_dir = pathlib.Path('/Volumes/Work/Data/solo/mag')
 
@@ -27,9 +28,9 @@ class MAGL2(CDFFile):
 
         raise FileNotFoundError(f'No MAG data for {self.date} in {base_dir}')
 
-    def get_bvec(self, dtime):
+    def get_bvec(self, epoch):
         """
         Get the magnetic field vector closest to *time*.
         """
-        idx = np.argmin(np.abs(self.times - dtime))
-        return MAGVector(self.mag_rtn[idx, :])
+        idx = np.argmin(np.abs(epoch - self.epochs))
+        return Vector(self.mag_rtn[idx, :])
