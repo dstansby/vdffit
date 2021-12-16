@@ -84,19 +84,6 @@ class SPANL2CDF(VDFCDF):
                                 self.mag_cdf.get_bvec(epoch),
                                 self.species)
 
-    @property
-    def accum_intervals(self):
-        """
-        Accumulation intervals.
-
-        Notes
-        -----
-        An accumulation time of 0.216s is hard-coded
-        """
-        dt = 0.216 * u.s
-        t = time.Time(times)
-        return sunpy.time.TimeRange(t, t + dt)
-
     @cached_property
     def eflux(self):
         """

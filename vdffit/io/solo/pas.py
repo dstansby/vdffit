@@ -60,31 +60,13 @@ class PASL2CDF(VDFCDF):
 
         epoch = self.epochs[idx]
 
-        if self.species == 'p':
-            mass = const.m_p
-        elif self.species == 'a':
-            mass = 4 * const.m_p
         return SPANDistribution(self.eflux[idx, :],
                                 self.energy[idx, :],
                                 self.theta[idx, :],
                                 self.phi[idx, :],
-                                mass,
                                 time,
                                 self.mag_cdf.get_bvec(epoch),
                                 self.species)
-
-    @property
-    def accum_intervals(self):
-        """
-        Accumulation intervals.
-
-        Notes
-        -----
-        An accumulation time of 0.216s is hard-coded
-        """
-        dt = 0.216 * u.s
-        t = time.Time(times)
-        return sunpy.time.TimeRange(t, t + dt)
 
     @cached_property
     def eflux(self):
