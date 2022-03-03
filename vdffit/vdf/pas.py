@@ -12,16 +12,24 @@ class PASDistribution(VDFBase):
     A single distribution measured by PAS.
     """
 
-    def __init__(self, vdf, energy, theta, phi, time, bvec):
-        self.vdf = vdf
-        self._theta = theta
-        self._phi = phi
+    def __init__(self, vdf, energy, theta, phi, start_idx, shape, time, bvec):
+        self.start_idx = start_idx
+        end_idx = [start + s for start, s in zip(start_idx, shape)]
+        slc = tuple(slice(s, e) for s, e in zip(start_idx, end_idx))
+
+        self._vdf = vdf[slc]
+        self._theta = theta[slc[:2]]
+        self._phi = phi[slc[:2]]
+
         self._time = time
         self._bvec = bvec
         # Assume proton mass
         self.mass = const.m_p
 
         self._modv = np.sqrt(2 * energy / self.mass).to(u.km / u.s)
+
+    def vdf(self):
+        return self._vdf
 
     @property
     def time(self):
@@ -41,6 +49,7 @@ class PASDistribution(VDFBase):
         idx, _ = self.peak_vdf
         return np.unravel_index(idx, self.shape)
 
+    '''
     def max_vdf_on_edge(self):
         """
         Return True if the peak of the VDF is at the edge of the angular bins.
@@ -64,21 +73,13 @@ class PASDistribution(VDFBase):
             return False
 
         return True
+    '''
 
     def quality_flag_info(self):
-        return {2: "Peak of the distribution function is on an edge.",
-                3: "Not all bins adjacent to peak VDF have finite data.",
-                4: "Distribution function doesn't have 8x32x8 points."}
+        return {}
 
     def quality_flag(self):
-        if self.eflux.size != 8 * 32 * 8:
-            return 4
-        elif self.max_vdf_on_edge():
-            return 2
-        elif not self.has_angular_resolution():
-            return 3
-        else:
-            return 1
+        return 1
 
     @property
     def bvec(self):
@@ -115,16 +116,10 @@ class PASDistribution(VDFBase):
         vz = vinstr[:, 0]
         return np.stack([vx, vy, vz], axis=-1)
 
-    @cached_property
-    def vdf(self):
-        """
-        3D array of velocity distribution function values.
-        """
-        return (self.eflux * 2 /
-                self._modv**4).to(u.s**3 / u.m**6)
-
+    '''
     @property
     def mask(self):
         _, peak_val = self.peak_vdf
         # Only select values within 1% of peak VDF value
         return (self.vdf > 0.01 * peak_val).astype(bool)
+    '''

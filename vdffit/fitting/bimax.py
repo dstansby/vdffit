@@ -99,6 +99,11 @@ class BiMaxFitter(FitterBase):
         return [A0, v0[0], v0[1], v0[2], 40, 40]
 
     def post_fit_process(self, params):
+        """
+        - Create a TimeSeries
+        - Attach units
+        - Convert thermal speeds to temperatures
+        """
         params = pd.DataFrame(params)
         ts = TimeSeries(time=params['Time'])
         ts['n'] = (params['A'].values * self.vdfunit *

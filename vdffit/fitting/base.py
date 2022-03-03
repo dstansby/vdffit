@@ -21,7 +21,7 @@ class FitterBase(abc.ABC):
         cdf : vdffit.io.CDFFile
         """
         times = cdf.times
-        params = Parallel(n_jobs=-1, verbose=1)(
+        params = Parallel(n_jobs=1, verbose=1)(
             delayed(self.fit_single)(cdf[t]) for t in times)
         params = self.post_fit_process(params)
         return params

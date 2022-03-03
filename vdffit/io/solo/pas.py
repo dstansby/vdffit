@@ -2,6 +2,7 @@ from functools import cached_property
 import pathlib
 
 import astropy.constants as const
+import astropy.units as u
 import numpy as np
 
 from vdffit.vdf import PASDistribution
@@ -10,6 +11,7 @@ from vdffit.io.solo.mag import MAGL2
 
 
 base_dir = pathlib.Path('/Volumes/Work/Data/solo/swa/pas')
+u.add_enabled_units([u.def_unit('unitless', u.dimensionless_unscaled)])
 
 
 class PASL2CDF(VDFCDF):
@@ -64,11 +66,19 @@ class PASL2CDF(VDFCDF):
             time = self.times[idx]
 
         epoch = self.epochs[idx]
+        start_idx = [self.start_azimuth_idx[idx],
+                     self.start_elevation_idx[idx],
+                     self.start_energy_idx[idx]]
+        shape = [self.n_azimuth[idx],
+                 self.n_elevation[idx],
+                 self.n_energy[idx]]
 
         return PASDistribution(self.vdf[idx, ...],
                                self.energy,
                                self.theta,
                                self.phi,
+                               start_idx,
+                               shape,
                                time,
                                self.mag_cdf.get_bvec(epoch))
 
@@ -77,7 +87,7 @@ class PASL2CDF(VDFCDF):
         """
         Velocity distribution function.
 
-        Shape (ntime, ntheta, nphi, nenergy).
+        Shape (ntime, nphi, ntheta, nenergy).
         """
         return self.varget('vdf')
 
@@ -86,7 +96,7 @@ class PASL2CDF(VDFCDF):
         """
         Energies.
 
-        Shape (nenergy).
+        Shape (nenergy,).
         """
         return self.varget('Energy')
 
@@ -95,15 +105,78 @@ class PASL2CDF(VDFCDF):
         """
         Theta values.
 
-        Shape (ntheta, nphi, nenergy).
+        Shape (nphi, ntheta,).
         """
-        return self.varget('Full_elevation')
+        return self.varget('Full_elevation')[:, :, 1]
 
     @cached_property
     def phi(self):
         """
         Phi values.
 
-        Shape (ntheta, nphi, nenergy).
+        Shape (nphi, ntheta,).
         """
-        return self.varget('Full_azimuth')
+        return self.varget('Full_azimuth')[:, :, 1]
+
+    @cached_property
+    def elevation_correction(self):
+        """
+        Elevation correction.
+
+        Shape (nenergy,)
+        """
+        return self.varget('Elevation_correction')
+
+    @cached_property
+    def start_energy_idx(self):
+        """
+        Index of the first energy bin.
+
+        Shape (ntime,)
+        """
+        return self.varget('start_energy').value.astype(int)
+
+    @cached_property
+    def n_energy(self):
+        """
+        Number of energy bins.
+
+        Shape (ntime,)
+        """
+        return self.varget('nb_energy').value.astype(int)
+
+    @cached_property
+    def start_elevation_idx(self):
+        """
+        Index of the first elevation bin.
+
+        Shape (ntime,)
+        """
+        return self.varget('start_elevation').value.astype(int)
+
+    @cached_property
+    def n_elevation(self):
+        """
+        Number of energy bins.
+
+        Shape (ntime,)
+        """
+        return self.varget('nb_elevation').value.astype(int)
+
+    @cached_property
+    def start_azimuth_idx(self):
+        """
+        Index of the first azimuth bin.
+
+        Shape (ntime,)
+        """
+        return self.varget('start_CEM').value.astype(int)
+
+    @cached_property
+    def n_azimuth(self):
+        """
+        Number of energy bins.
+
+        Shape (ntime,)
+        """
+        return self.varget('nb_CEM').value.astype(int)
