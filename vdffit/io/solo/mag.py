@@ -8,6 +8,8 @@ from vdffit.util.vector import Vector
 
 base_dir = pathlib.Path('/Volumes/Work/Data/solo/mag')
 
+__all__ = ['MAGL2']
+
 
 class MAGL2(CDFFile):
     def __init__(self, date):

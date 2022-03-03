@@ -1,6 +1,9 @@
 from .bimax import BiMaxFitter
 
 
+__all__ = ['PSPProtonCoreFitter']
+
+
 class PSPProtonCoreFitter(BiMaxFitter):
     """
     """

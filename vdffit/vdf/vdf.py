@@ -1,6 +1,9 @@
 import abc
 
 
+__all__ = ['VDFBase']
+
+
 class VDFBase(abc.ABC):
     """
     A single velocity distribution function.

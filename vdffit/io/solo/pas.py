@@ -14,6 +14,9 @@ base_dir = pathlib.Path('/Volumes/Work/Data/solo/swa/pas')
 u.add_enabled_units([u.def_unit('unitless', u.dimensionless_unscaled)])
 
 
+__all__ = ['PASL2CDF']
+
+
 class PASL2CDF(VDFCDF):
     """
     A SWA PAS level 2 file.

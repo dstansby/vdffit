@@ -8,6 +8,9 @@ import pandas as pd
 from .base import FitterBase
 
 
+__all__ = ['BiMaxFitter']
+
+
 class BiMaxFitter(FitterBase):
     @property
     def fit_param_names(self):

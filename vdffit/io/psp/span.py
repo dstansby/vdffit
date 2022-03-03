@@ -12,6 +12,9 @@ from vdffit.io.psp.mag import MAGL2
 base_dir = pathlib.Path('/Volumes/Work/Data/psp/sweap/span')
 
 
+__all__ = ['SPANL2CDF']
+
+
 class SPANL2CDF(VDFCDF):
     """
     A SWEAP SPAN level 2 file.

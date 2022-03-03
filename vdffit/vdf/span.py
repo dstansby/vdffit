@@ -5,6 +5,8 @@ import numpy as np
 
 from .vdf import VDFBase
 
+__all__ = ['SPANDistribution']
+
 
 class SPANDistribution(VDFBase):
     """

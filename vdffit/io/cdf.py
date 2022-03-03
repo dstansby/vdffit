@@ -5,6 +5,9 @@ import astropy.units as u
 import cdflib
 
 
+__all__ = ['CDFFile']
+
+
 class CDFFile(abc.ABC):
     """
     Interface to a single CDF file.

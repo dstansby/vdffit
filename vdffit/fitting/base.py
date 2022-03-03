@@ -8,6 +8,9 @@ import pandas as pd
 from joblib import Parallel, delayed
 
 
+__all__ = ['FitterBase']
+
+
 class FitterBase(abc.ABC):
     vunit = u.km / u.s
     vdfunit = u.s**3 / u.m**6

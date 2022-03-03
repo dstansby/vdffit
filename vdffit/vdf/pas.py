@@ -7,6 +7,9 @@ import numpy as np
 from .vdf import VDFBase
 
 
+__all__ = ['PASDistribution']
+
+
 class PASDistribution(VDFBase):
     """
     A single distribution measured by PAS.

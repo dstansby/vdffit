@@ -12,6 +12,8 @@ from vdffit.util.vector import Vector
 
 base_dir = pathlib.Path('/Volumes/Work/Data/psp/fields/l2/mag_sc_4_per_cycle')
 
+__all__ = ['MAGL2']
+
 
 class MAGL2(CDFFile):
     """
