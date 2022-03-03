@@ -1,12 +1,8 @@
 import abc
 
-from astropy.table import QTable
 import astropy.units as u
 import numpy as np
-import pandas as pd
-
 from joblib import Parallel, delayed
-
 
 __all__ = ['FitterBase']
 

@@ -4,7 +4,6 @@ from functools import cached_property
 import astropy.units as u
 import cdflib
 
-
 __all__ = ['CDFFile']
 
 

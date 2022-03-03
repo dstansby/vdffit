@@ -1,9 +1,10 @@
-from vdffit.net.psp import fetch_psp_files
-from vdffit.io.psp import SPANL2CDF
-from vdffit.fitting import BiMaxFitter
 from datetime import datetime
 
 from astropy.timeseries import TimeSeries
+
+from vdffit.fitting import BiMaxFitter
+from vdffit.io.psp import SPANL2CDF
+from vdffit.net.psp import fetch_psp_files
 
 
 def test_psp():

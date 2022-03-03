@@ -1,13 +1,11 @@
 from functools import cached_property
 
 import astropy.constants as const
-import numpy as np
-
-from vdffit.vdf import SPANDistribution
-from vdffit.io.cdf import VDFCDF
-from vdffit.io.psp.mag import MAGL2
 
 from vdffit import data_dir
+from vdffit.io.cdf import VDFCDF
+from vdffit.io.psp.mag import MAGL2
+from vdffit.vdf import SPANDistribution
 
 __all__ = ['SPANL2CDF']
 

@@ -1,7 +1,7 @@
-from vdffit.net.psp import fetch_psp_files
-from vdffit.io.psp import SPANL2CDF
-from vdffit.fitting import BiMaxFitter
 from datetime import datetime
+
+from vdffit.fitting import BiMaxFitter
+from vdffit.io.psp import SPANL2CDF
 
 # files = fetch_psp_files('2020-01-01', '2020-01-08')
 

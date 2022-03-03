@@ -1,14 +1,11 @@
-from functools import cached_property
 import pathlib
+from functools import cached_property
 
-import astropy.constants as const
 import astropy.units as u
-import numpy as np
 
-from vdffit.vdf import PASDistribution
 from vdffit.io.cdf import VDFCDF
 from vdffit.io.solo.mag import MAGL2
-
+from vdffit.vdf import PASDistribution
 
 base_dir = pathlib.Path('/Volumes/Work/Data/solo/swa/pas')
 u.add_enabled_units([u.def_unit('unitless', u.dimensionless_unscaled)])

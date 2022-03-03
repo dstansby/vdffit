@@ -1,14 +1,10 @@
-from datetime import date
 from functools import cached_property
 
-import cdflib
 import numpy as np
 
-from vdffit.io.cdf import CDFFile
-
-from vdffit.util.vector import Vector
-
 from vdffit import data_dir
+from vdffit.io.cdf import CDFFile
+from vdffit.util.vector import Vector
 
 __all__ = ['MAGL2']
 

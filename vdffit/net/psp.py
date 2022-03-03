@@ -1,4 +1,5 @@
-from sunpy.net import Fido, attrs as a
+from sunpy.net import Fido
+from sunpy.net import attrs as a
 
 
 def fetch_psp_files(starttime, endtime):

@@ -1,12 +1,11 @@
-from astropy.timeseries import TimeSeries
-import numpy as np
-import scipy.optimize as opt
 import astropy.constants as const
 import astropy.units as u
+import numpy as np
 import pandas as pd
+import scipy.optimize as opt
+from astropy.timeseries import TimeSeries
 
 from .base import FitterBase
-
 
 __all__ = ['BiMaxFitter']
 
