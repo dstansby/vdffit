@@ -1,15 +1,11 @@
-from vdffit.io import PASL2CDF
+from vdffit.net.psp import fetch_psp_files
+from vdffit.io.psp import SPANL2CDF
 from vdffit.fitting import BiMaxFitter
 from datetime import datetime
 
-cdf = PASL2CDF(datetime(2021, 8, 13))
-vdf = cdf[0]
-exit()
+# files = fetch_psp_files('2020-01-01', '2020-01-08')
 
-print(vdf.velocities_instr_frame())
-exit()
-
-cdf = SPANL2CDF(datetime(2021, 6, 30))
+cdf = SPANL2CDF(datetime(2020, 1, 7))
 fitter = BiMaxFitter()
 result = fitter.fit_cdf(cdf)
 print(result)

@@ -1,5 +1,4 @@
 from datetime import date
-import pathlib
 from functools import cached_property
 
 import cdflib
@@ -9,8 +8,7 @@ from vdffit.io.cdf import CDFFile
 
 from vdffit.util.vector import Vector
 
-
-base_dir = pathlib.Path('/Volumes/Work/Data/psp/fields/l2/mag_sc_4_per_cycle')
+from vdffit import data_dir
 
 __all__ = ['MAGL2']
 
@@ -32,7 +30,7 @@ class MAGL2(CDFFile):
         date_str = self.date.strftime('%Y%m%d')
         fname = f'psp_fld_l2_mag_sc_4_sa_per_cyc_{date_str}_v02.cdf'
 
-        return base_dir / self.date.strftime('%Y') / fname
+        return data_dir / fname
 
     @cached_property
     def all_bvecs(self):

@@ -1,5 +1,4 @@
 from functools import cached_property
-import pathlib
 
 import astropy.constants as const
 import numpy as np
@@ -8,9 +7,7 @@ from vdffit.vdf import SPANDistribution
 from vdffit.io.cdf import VDFCDF
 from vdffit.io.psp.mag import MAGL2
 
-
-base_dir = pathlib.Path('/Volumes/Work/Data/psp/sweap/span')
-
+from vdffit import data_dir
 
 __all__ = ['SPANL2CDF']
 
@@ -46,11 +43,10 @@ class SPANL2CDF(VDFCDF):
     def path(self):
         date_str = self.date.strftime('%Y%m%d')
         if self.species == 'p':
-            fname = f'{self.date.year}/psp_swp_spi_sf00_l2_8dx32ex8a_{date_str}_v03.cdf'
-            return base_dir / 'protons' / fname
+            fname = f'psp_swp_spi_sf00_l2_8dx32ex8a_{date_str}_v04.cdf'
+            return data_dir / fname
         elif self.species == 'a':
-            fname = f'{self.date.year}/psp_swp_spi_sf01_l2_8dx32ex8a_{date_str}_v03.cdf'
-            return base_dir / 'alphas' / fname
+            raise NotImplementedError()
 
     def __getitem__(self, idx):
         """
